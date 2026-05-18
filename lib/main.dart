@@ -1,12 +1,14 @@
-// lib/main.dart
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+
 import 'providers/subscription_provider.dart';
+import 'screens/calendar_screen.dart';
+import 'screens/chat_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/services_screen.dart';
-import 'screens/statistics_screen.dart';
 import 'screens/settings_screen.dart';
+import 'screens/statistics_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,8 +18,10 @@ void main() async {
       statusBarIconBrightness: Brightness.dark,
     ),
   );
+
   final provider = SubscriptionProvider();
   await provider.load();
+
   runApp(
     ChangeNotifierProvider.value(
       value: provider,
@@ -32,20 +36,21 @@ class OffSubApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: '오프서브',
+      title: 'OffSub',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,
+        fontFamily: 'Pretendard',
         colorScheme: ColorScheme.fromSeed(
           seedColor: const Color(0xFF3182F6),
           brightness: Brightness.light,
         ),
         scaffoldBackgroundColor: const Color(0xFFF2F4F6),
-        cardTheme: const CardThemeData(
+        cardTheme: CardThemeData(
           elevation: 0,
           color: Colors.white,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(24)),
+            borderRadius: BorderRadius.circular(20),
           ),
           margin: EdgeInsets.zero,
         ),
@@ -55,40 +60,10 @@ class OffSubApp extends StatelessWidget {
           scrolledUnderElevation: 0,
           titleTextStyle: TextStyle(
             color: Color(0xFF191F28),
-            fontSize: 18,
+            fontSize: 20,
             fontWeight: FontWeight.w700,
           ),
           iconTheme: IconThemeData(color: Color(0xFF191F28)),
-        ),
-        inputDecorationTheme: InputDecorationTheme(
-          filled: true,
-          fillColor: const Color(0xFFF8F9FA),
-          contentPadding:
-          const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(16),
-            borderSide: BorderSide.none,
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(16),
-            borderSide:
-            const BorderSide(color: Color(0xFF3182F6), width: 1.5),
-          ),
-          labelStyle:
-          const TextStyle(color: Color(0xFF8B95A1), fontSize: 14),
-        ),
-        textTheme: const TextTheme(
-          displayLarge: TextStyle(
-            color: Color(0xFF191F28),
-            fontWeight: FontWeight.w800,
-          ),
-          titleLarge: TextStyle(
-            color: Color(0xFF191F28),
-            fontWeight: FontWeight.w700,
-          ),
-          bodyLarge: TextStyle(color: Color(0xFF191F28)),
-          bodyMedium: TextStyle(color: Color(0xFF4E5968)),
-          bodySmall: TextStyle(color: Color(0xFF8B95A1)),
         ),
       ),
       home: const RootScreen(),
@@ -110,6 +85,8 @@ class _RootScreenState extends State<RootScreen> {
     HomeScreen(),
     ServicesScreen(),
     StatisticsScreen(),
+    CalendarScreen(),
+    ChatScreen(),
     SettingsScreen(),
   ];
 
@@ -120,45 +97,43 @@ class _RootScreenState extends State<RootScreen> {
         index: _currentIndex,
         children: _screens,
       ),
-      bottomNavigationBar: Container(
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          border: Border(
-            top: BorderSide(color: Color(0xFFE5E8EB), width: 1),
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: _currentIndex,
+        onDestinationSelected: (index) => setState(() => _currentIndex = index),
+        backgroundColor: Colors.white,
+        indicatorColor: const Color(0xFFEBF3FE),
+        destinations: const [
+          NavigationDestination(
+            icon: Icon(Icons.home_outlined),
+            selectedIcon: Icon(Icons.home_rounded),
+            label: '홈',
           ),
-        ),
-        child: BottomNavigationBar(
-          currentIndex: _currentIndex,
-          onTap: (i) => setState(() => _currentIndex = i),
-          type: BottomNavigationBarType.fixed,
-          backgroundColor: Colors.white,
-          selectedItemColor: const Color(0xFF3182F6),
-          unselectedItemColor: const Color(0xFFB0B8C1),
-          selectedLabelStyle: const TextStyle(
-            fontSize: 11,
-            fontWeight: FontWeight.w600,
+          NavigationDestination(
+            icon: Icon(Icons.apps_outlined),
+            selectedIcon: Icon(Icons.apps_rounded),
+            label: '서비스',
           ),
-          unselectedLabelStyle: const TextStyle(fontSize: 11),
-          elevation: 0,
-          items: const [
-            BottomNavigationBarItem(
-                icon: Icon(Icons.home_outlined),
-                activeIcon: Icon(Icons.home_rounded),
-                label: '홈'),
-            BottomNavigationBarItem(
-                icon: Icon(Icons.apps_outlined),
-                activeIcon: Icon(Icons.apps_rounded),
-                label: '서비스'),
-            BottomNavigationBarItem(
-                icon: Icon(Icons.bar_chart_outlined),
-                activeIcon: Icon(Icons.bar_chart_rounded),
-                label: '통계'),
-            BottomNavigationBarItem(
-                icon: Icon(Icons.settings_outlined),
-                activeIcon: Icon(Icons.settings_rounded),
-                label: '설정'),
-          ],
-        ),
+          NavigationDestination(
+            icon: Icon(Icons.bar_chart_outlined),
+            selectedIcon: Icon(Icons.bar_chart_rounded),
+            label: '통계',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.calendar_month_outlined),
+            selectedIcon: Icon(Icons.calendar_month_rounded),
+            label: '캘린더',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.auto_awesome_outlined),
+            selectedIcon: Icon(Icons.auto_awesome_rounded),
+            label: 'AI',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.settings_outlined),
+            selectedIcon: Icon(Icons.settings_rounded),
+            label: '설정',
+          ),
+        ],
       ),
     );
   }

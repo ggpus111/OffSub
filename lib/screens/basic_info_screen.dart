@@ -1,7 +1,5 @@
 // lib/screens/basic_info_screen.dart
-import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 class BasicInfoScreen extends StatefulWidget {
   const BasicInfoScreen({super.key});
@@ -25,14 +23,26 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
   @override
   void initState() {
     super.initState();
-    for (final c in [_nameCtrl, _nicknameCtrl, _emailCtrl, _phoneCtrl, _birthCtrl]) {
+    for (final c in [
+      _nameCtrl,
+      _nicknameCtrl,
+      _emailCtrl,
+      _phoneCtrl,
+      _birthCtrl
+    ]) {
       c.addListener(() => setState(() => _hasChanges = true));
     }
   }
 
   @override
   void dispose() {
-    for (final c in [_nameCtrl, _nicknameCtrl, _emailCtrl, _phoneCtrl, _birthCtrl]) {
+    for (final c in [
+      _nameCtrl,
+      _nicknameCtrl,
+      _emailCtrl,
+      _phoneCtrl,
+      _birthCtrl
+    ]) {
       c.dispose();
     }
     super.dispose();
@@ -58,7 +68,9 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
         ),
         title: const Text('기본 정보',
             style: TextStyle(
-                color: Colors.black, fontSize: 17, fontWeight: FontWeight.w700)),
+                color: Colors.black,
+                fontSize: 17,
+                fontWeight: FontWeight.w700)),
         centerTitle: true,
         actions: [
           TextButton(
@@ -154,7 +166,8 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
                 child: _InputField(
                   controller: _nameCtrl,
                   hint: '이름을 입력해주세요',
-                  validator: (v) => (v == null || v.isEmpty) ? '이름을 입력해주세요' : null,
+                  validator: (v) =>
+                      (v == null || v.isEmpty) ? '이름을 입력해주세요' : null,
                 ),
               ),
               const SizedBox(height: 16),
@@ -167,7 +180,8 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
                   controller: _nicknameCtrl,
                   hint: '닉네임을 입력해주세요',
                   maxLength: 15,
-                  validator: (v) => (v == null || v.length < 2) ? '2자 이상 입력해주세요' : null,
+                  validator: (v) =>
+                      (v == null || v.length < 2) ? '2자 이상 입력해주세요' : null,
                 ),
               ),
               const SizedBox(height: 16),
@@ -180,8 +194,9 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
                   controller: _emailCtrl,
                   hint: 'example@email.com',
                   keyboardType: TextInputType.emailAddress,
-                  validator: (v) =>
-                  (v == null || !v.contains('@')) ? '올바른 이메일을 입력해주세요' : null,
+                  validator: (v) => (v == null || !v.contains('@'))
+                      ? '올바른 이메일을 입력해주세요'
+                      : null,
                 ),
               ),
               const SizedBox(height: 16),
@@ -217,7 +232,8 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
               _FormSection(
                 label: '성별',
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(12),
@@ -314,7 +330,7 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
     );
     if (picked != null) {
       _birthCtrl.text =
-      '${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}';
+          '${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}';
       setState(() => _hasChanges = true);
     }
   }
@@ -327,7 +343,8 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
               style: TextStyle(fontWeight: FontWeight.w600)),
           backgroundColor: const Color(0xFF00C073),
           behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           margin: const EdgeInsets.all(16),
           duration: const Duration(seconds: 2),
         ),
@@ -377,28 +394,28 @@ class _FormSection extends StatelessWidget {
       {required this.label, this.helperText, required this.child});
   @override
   Widget build(BuildContext context) => Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Padding(
-        padding: const EdgeInsets.only(left: 4, bottom: 6),
-        child: Text(label,
-            style: const TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-                color: Color(0xFF555555))),
-      ),
-      child,
-      if (helperText != null) ...[
-        const SizedBox(height: 4),
-        Padding(
-          padding: const EdgeInsets.only(left: 4),
-          child: Text(helperText!,
-              style:
-              const TextStyle(fontSize: 11, color: Color(0xFFAAAAAA))),
-        ),
-      ],
-    ],
-  );
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(left: 4, bottom: 6),
+            child: Text(label,
+                style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF555555))),
+          ),
+          child,
+          if (helperText != null) ...[
+            const SizedBox(height: 4),
+            Padding(
+              padding: const EdgeInsets.only(left: 4),
+              child: Text(helperText!,
+                  style:
+                      const TextStyle(fontSize: 11, color: Color(0xFFAAAAAA))),
+            ),
+          ],
+        ],
+      );
 }
 
 class _InputField extends StatelessWidget {
@@ -410,44 +427,43 @@ class _InputField extends StatelessWidget {
   final IconData? suffixIcon;
   const _InputField(
       {required this.controller,
-        required this.hint,
-        this.keyboardType,
-        this.validator,
-        this.maxLength,
-        this.suffixIcon});
+      required this.hint,
+      this.keyboardType,
+      this.validator,
+      this.maxLength,
+      this.suffixIcon});
   @override
   Widget build(BuildContext context) => TextFormField(
-    controller: controller,
-    keyboardType: keyboardType,
-    validator: validator,
-    maxLength: maxLength,
-    style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
-    decoration: InputDecoration(
-      hintText: hint,
-      hintStyle:
-      const TextStyle(color: Color(0xFFCCCCCC), fontSize: 14),
-      filled: true,
-      fillColor: Colors.white,
-      counterText: '',
-      suffixIcon: suffixIcon != null
-          ? Icon(suffixIcon, color: const Color(0xFFAAAAAA), size: 18)
-          : null,
-      border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide.none),
-      enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide.none),
-      focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide:
-          const BorderSide(color: Color(0xFF3182F6), width: 1.5)),
-      errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide:
-          const BorderSide(color: Color(0xFFFF6B6B), width: 1.5)),
-      contentPadding:
-      const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-    ),
-  );
+        controller: controller,
+        keyboardType: keyboardType,
+        validator: validator,
+        maxLength: maxLength,
+        style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+        decoration: InputDecoration(
+          hintText: hint,
+          hintStyle: const TextStyle(color: Color(0xFFCCCCCC), fontSize: 14),
+          filled: true,
+          fillColor: Colors.white,
+          counterText: '',
+          suffixIcon: suffixIcon != null
+              ? Icon(suffixIcon, color: const Color(0xFFAAAAAA), size: 18)
+              : null,
+          border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide.none),
+          enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide.none),
+          focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide:
+                  const BorderSide(color: Color(0xFF3182F6), width: 1.5)),
+          errorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide:
+                  const BorderSide(color: Color(0xFFFF6B6B), width: 1.5)),
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        ),
+      );
 }
