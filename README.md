@@ -1,8 +1,8 @@
-# 📱 OffSub (오프서브)
+# OffSub (오프서브)
 > **On-Device AI Subscription Management** > 사용자의 프라이버시를 최우선으로 생각하는 온디바이스 AI 기반 구독 관리 플랫폼
 
 OffSub은 Android 16의 **Gemini Nano**를 활용하여 결제 내역과 앱 사용 시간을 로컬에서 분석하고, 서버 전송 없이 안전하고 스마트한 구독 해지 가이드를 제공합니다.
-
+<img src="assets/images/logo_color.png" width="100">
 ---
 
 ## 📸 Screen Shots
