@@ -21,4 +21,45 @@ class NativeBridge {
       return [];
     }
   }
+
+  // 사용 정보 접근 권한 설정 화면 열기. 네이티브 구현이 없으면 false를 반환합니다.
+  static Future<bool> openUsageAccessSettings() async {
+    try {
+      final result = await platform.invokeMethod('openUsageAccessSettings');
+      return result == true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  static Future<bool> hasSmsPermission() async {
+    try {
+      final result = await platform.invokeMethod('hasSmsPermission');
+      return result == true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  static Future<bool> requestSmsPermission() async {
+    try {
+      final result = await platform.invokeMethod('requestSmsPermission');
+      return result == true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  static Future<List<Map<String, dynamic>>> getSmsMessages({int limit = 500}) async {
+    try {
+      final result = await platform.invokeMethod('getSmsMessages', {'limit': limit});
+      if (result is! List) return [];
+      return result
+          .whereType<Map>()
+          .map((item) => item.map((key, value) => MapEntry(key.toString(), value)))
+          .toList();
+    } catch (_) {
+      return [];
+    }
+  }
 }

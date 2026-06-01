@@ -54,15 +54,29 @@ class SubscriptionCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      subscription.name,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w700,
-                        color: Color(0xFF191F28),
-                      ),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            subscription.name,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w700,
+                              color: Color(0xFF191F28),
+                            ),
+                          ),
+                        ),
+                        if (!subscription.confirmed) ...[
+                          const SizedBox(width: 6),
+                          const _MetaChip(
+                            label: '확인 필요',
+                            color: Color(0xFFF57C00),
+                            background: Color(0xFFFFF3E0),
+                          ),
+                        ],
+                      ],
                     ),
                     const SizedBox(height: 6),
                     Wrap(
@@ -70,6 +84,12 @@ class SubscriptionCard extends StatelessWidget {
                       runSpacing: 4,
                       children: [
                         _MetaChip(label: subscription.category),
+                        if (subscription.isAutoDetected)
+                          _MetaChip(
+                            label: subscription.source.label,
+                            color: const Color(0xFF3182F6),
+                            background: const Color(0xFFEBF3FE),
+                          ),
                         _MetaChip(
                           label: isToday
                               ? '오늘 결제'

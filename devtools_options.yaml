@@ -1,3 +1,5 @@
 description: This file stores settings for Dart & Flutter DevTools.
+flutter_local_notifications: ^17.2.4
+timezone: ^0.9.4
 documentation: https://docs.flutter.dev/tools/devtools/extensions#configure-extension-enablement-states
 extensions:
