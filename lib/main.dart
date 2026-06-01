@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import 'providers/subscription_provider.dart';
+import 'services/notification_service.dart';
 import 'screens/calendar_screen.dart';
 import 'screens/chat_screen.dart';
 import 'screens/home_screen.dart';
@@ -19,8 +20,11 @@ void main() async {
     ),
   );
 
+  await NotificationService.initialize();
+
   final provider = SubscriptionProvider();
   await provider.load();
+  await NotificationService.rescheduleIfEnabled(provider.subscriptions);
 
   runApp(
     ChangeNotifierProvider.value(

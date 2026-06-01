@@ -1,5 +1,8 @@
 // lib/screens/permission_screen.dart
+import '../services/native_bridge.dart';
+import 'detected_subscriptions_screen.dart';
 import 'package:flutter/material.dart';
+import '../main.dart';
 
 const _kPrimary = Color(0xFF3182F6);
 const _kBg = Colors.white;
@@ -170,8 +173,21 @@ class PermissionScreen extends StatelessWidget {
                     width: double.infinity,
                     height: 56,
                     child: ElevatedButton(
-                      onPressed: () {
-                        // Request permissions then navigate
+                      onPressed: () async {
+                        final granted = await NativeBridge.requestSmsPermission();
+                        if (!context.mounted) return;
+
+                        if (!granted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('문자 접근 권한이 필요해요.')),
+                          );
+                          return;
+                        }
+
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => const DetectedSubscriptionsScreen()),
+                        );
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: _kPrimary,
@@ -190,7 +206,13 @@ class PermissionScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
                   TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(builder: (_) => const RootScreen()),
+                            (route) => false,
+                      );
+                    },
                     child: const Text(
                       '나중에 설정할게요',
                       style: TextStyle(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'permission_screen.dart';
 import '../models/subscription.dart';
 import '../providers/subscription_provider.dart';
 import '../widgets/empty_state_widget.dart';
@@ -17,6 +18,14 @@ class ServicesScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('서비스 관리'),
         actions: [
+          IconButton(
+            tooltip: '문자에서 자동 감지',
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const PermissionScreen()),
+            ),
+            icon: const Icon(Icons.sms_outlined),
+          ),
           Padding(
             padding: const EdgeInsets.only(right: 12),
             child: IconButton.filledTonal(

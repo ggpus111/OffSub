@@ -6,6 +6,7 @@ import '../providers/subscription_provider.dart';
 import '../widgets/empty_state_widget.dart';
 import '../widgets/subscription_card.dart';
 import 'add_service_screen.dart';
+import 'price_change_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -72,10 +73,18 @@ class HomeScreen extends StatelessWidget {
                     padding: const EdgeInsets.all(24),
                     child: _MonthlyCard(
                       total: provider.totalMonthlyAmount,
-                      count: subscriptions.length,
+                      paidThisMonth: provider.totalPaidThisMonth,
+                      count: provider.subscriptions.length,
                     ),
                   ),
                 ),
+                if (provider.priceChangeAlertCount > 0)
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(24, 0, 24, 16),
+                      child: _PriceChangeBanner(count: provider.priceChangeAlertCount),
+                    ),
+                  ),
                 if (subscriptions.isEmpty)
                   SliverFillRemaining(
                     hasScrollBody: false,
@@ -146,9 +155,14 @@ class HomeScreen extends StatelessWidget {
 
 class _MonthlyCard extends StatelessWidget {
   final int total;
+  final int paidThisMonth;
   final int count;
 
-  const _MonthlyCard({required this.total, required this.count});
+  const _MonthlyCard({
+    required this.total,
+    required this.paidThisMonth,
+    required this.count,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -183,22 +197,108 @@ class _MonthlyCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.18),
-              borderRadius: BorderRadius.circular(18),
-            ),
-            child: Text(
-              '구독 중인 서비스 $count개',
-              style: const TextStyle(
-                fontSize: 13,
-                color: Colors.white,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              _InfoPill(label: '구독 중인 서비스 $count개'),
+              _InfoPill(label: '이번 달 실제 결제 ${NumberFormat('#,###').format(paidThisMonth)}원'),
+            ],
           ),
         ],
+      ),
+    );
+  }
+}
+
+
+class _InfoPill extends StatelessWidget {
+  final String label;
+
+  const _InfoPill({required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.18),
+        borderRadius: BorderRadius.circular(18),
+      ),
+      child: Text(
+        label,
+        style: const TextStyle(
+          fontSize: 13,
+          color: Colors.white,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    );
+  }
+}
+
+
+class _PriceChangeBanner extends StatelessWidget {
+  final int count;
+
+  const _PriceChangeBanner({required this.count});
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(18),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(18),
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const PriceChangeScreen()),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(18),
+          child: Row(
+            children: [
+              Container(
+                width: 42,
+                height: 42,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFFEEEE),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(
+                  Icons.trending_up_rounded,
+                  color: Color(0xFFFF4D4D),
+                ),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      '가격 변동 후보가 있어요',
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w800,
+                        color: Color(0xFF191F28),
+                      ),
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      '$count개 구독의 최근 결제 금액을 확인해 주세요.',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Color(0xFF8B95A1),
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const Icon(Icons.chevron_right_rounded, color: Color(0xFF8B95A1)),
+            ],
+          ),
+        ),
       ),
     );
   }

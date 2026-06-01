@@ -5,6 +5,10 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../providers/subscription_provider.dart';
+import '../services/notification_service.dart';
+import 'payment_history_screen.dart';
+import 'price_change_screen.dart';
+import 'app_usage_analysis_screen.dart';
 
 const _kPrimary = Color(0xFF3182F6);
 const _kBg = Color(0xFFF2F4F6);
@@ -42,9 +46,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> _setNotification(bool value) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(_notificationKey, value);
-    setState(() => _notificationOn = value);
+    final provider = context.read<SubscriptionProvider>();
+    await NotificationService.setEnabled(value, provider.subscriptions);
+
+    final enabled = await NotificationService.isEnabled();
+    if (!mounted) return;
+    setState(() => _notificationOn = enabled);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          enabled
+              ? '결제 하루 전과 당일 오전 9시에 알림을 보낼게요.'
+              : '결제 알림을 껐어요.',
+        ),
+      ),
+    );
   }
 
   Future<void> _setBiometric(bool value) async {
@@ -70,7 +87,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               icon: Icons.notifications_outlined,
               iconColor: const Color(0xFFFF9500),
               label: '결제 알림',
-              subtitle: '다가오는 결제를 홈 화면에서 강조 표시해요.',
+              subtitle: '결제 하루 전과 당일 오전 9시에 알려드려요.',
               value: _notificationOn,
               onChanged: _setNotification,
             ),
@@ -103,10 +120,47 @@ class _SettingsScreenState extends State<SettingsScreen> {
           const _SectionLabel('데이터'),
           _SettingsGroup(children: [
             _ActionTile(
+              icon: Icons.receipt_long_outlined,
+              iconColor: _kPrimary,
+              label: '결제 이력 보기',
+              subtitle: '문자에서 감지된 실제 결제 기록을 확인해요.',
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const PaymentHistoryScreen()),
+              ),
+            ),
+            const _DividerLine(),
+            _ActionTile(
+              icon: Icons.trending_up_rounded,
+              iconColor: provider.priceChangeAlertCount > 0
+                  ? _kDanger
+                  : const Color(0xFF8B95A1),
+              label: '가격 변동 감지',
+              subtitle: provider.priceChangeAlertCount > 0
+                  ? '${provider.priceChangeAlertCount}개의 가격 변동 후보가 있어요.'
+                  : '최근 결제 금액 변화를 확인해요.',
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const PriceChangeScreen()),
+              ),
+            ),
+            const _DividerLine(),
+            _ActionTile(
+              icon: Icons.query_stats_rounded,
+              iconColor: const Color(0xFF5856D6),
+              label: '앱 사용량 분석',
+              subtitle: '구독료와 실제 앱 사용 시간을 비교해요.',
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const AppUsageAnalysisScreen()),
+              ),
+            ),
+            const _DividerLine(),
+            _ActionTile(
               icon: Icons.file_download_outlined,
               iconColor: const Color(0xFF34C759),
               label: '데이터 내보내기',
-              subtitle: '등록된 구독 목록을 JSON으로 클립보드에 복사해요.',
+              subtitle: '구독 목록과 결제 이력을 JSON으로 클립보드에 복사해요.',
               onTap: () async {
                 await Clipboard.setData(
                     ClipboardData(text: provider.exportJson()));
