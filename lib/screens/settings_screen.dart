@@ -26,9 +26,11 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   static const _notificationKey = 'setting_notification_on';
   static const _biometricKey = 'setting_biometric_on';
+  static const _userNameKey = 'local_user_name';
 
   bool _notificationOn = true;
   bool _biometricOn = false;
+  String _userName = '사용자';
 
   @override
   void initState() {
@@ -42,7 +44,53 @@ class _SettingsScreenState extends State<SettingsScreen> {
     setState(() {
       _notificationOn = prefs.getBool(_notificationKey) ?? true;
       _biometricOn = prefs.getBool(_biometricKey) ?? false;
+      _userName = prefs.getString(_userNameKey) ?? '사용자';
     });
+  }
+  Future<void> _changeUserName() async {
+    final controller = TextEditingController(text: _userName);
+
+    final result = await showDialog<String>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('사용자 이름 변경'),
+        content: TextField(
+          controller: controller,
+          maxLength: 12,
+          autofocus: true,
+          decoration: const InputDecoration(
+            hintText: '이름을 입력해 주세요',
+            counterText: '',
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('취소'),
+          ),
+          FilledButton(
+            onPressed: () {
+              final name = controller.text.trim();
+              if (name.isEmpty) return;
+              Navigator.pop(dialogContext, name);
+            },
+            child: const Text('저장'),
+          ),
+        ],
+      ),
+    );
+
+    if (result == null || result.isEmpty) return;
+
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_userNameKey, result);
+
+    if (!mounted) return;
+    setState(() => _userName = result);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('사용자 이름이 저장됐어요.')),
+    );
   }
 
   Future<void> _setNotification(bool value) async {
@@ -79,7 +127,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(20, 8, 20, 40),
         children: [
-          _ProfileCard(count: provider.subscriptions.length),
+        _ProfileCard(
+        name: _userName,
+        count: provider.subscriptions.length,
+        onTap: _changeUserName,
+      ),
           const SizedBox(height: 24),
           const _SectionLabel('알림'),
           _SettingsGroup(children: [
@@ -239,60 +291,88 @@ class _SettingsScreenState extends State<SettingsScreen> {
 }
 
 class _ProfileCard extends StatelessWidget {
+  final String name;
   final int count;
+  final VoidCallback onTap;
 
-  const _ProfileCard({required this.count});
+  const _ProfileCard({
+    required this.name,
+    required this.count,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
+    final initial = name.trim().isEmpty ? '사' : name.trim()[0];
+
+    return Material(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(18),
+      child: InkWell(
+        onTap: onTap,
         borderRadius: BorderRadius.circular(18),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 56,
-            height: 56,
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFF3182F6), Color(0xFF5AC8FA)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: const Icon(Icons.person_rounded, color: Colors.white),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'OffSub 사용자',
-                  style: TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.w800,
-                    color: _kTextPrimary,
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Row(
+            children: [
+              Container(
+                width: 56,
+                height: 56,
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF3182F6), Color(0xFF5AC8FA)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Center(
+                  child: Text(
+                    initial,
+                    style: const TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
-                const SizedBox(height: 3),
-                Text(
-                  '$count개 구독 관리 중',
-                  style: const TextStyle(fontSize: 13, color: _kTextSecondary),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      name,
+                      style: const TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w800,
+                        color: _kTextPrimary,
+                      ),
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      '$count개 구독 관리 중',
+                      style: const TextStyle(
+                        fontSize: 13,
+                        color: _kTextSecondary,
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+              const Icon(
+                Icons.edit_outlined,
+                size: 20,
+                color: _kTextSecondary,
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
 }
-
 class _SectionLabel extends StatelessWidget {
   final String text;
 
